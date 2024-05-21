@@ -49,6 +49,13 @@ source devel/setup.bash
 roslaunch turtle_dwa turtle_dwa.launch
 ```
 
+### Monitor via RViz
+Load a Preconfigured RViz Setup:
+
+```
+rviz -d ~/catkin_ws/src/turtle_dwa/config/turtle_dwa.rviz
+```
+
 ### Set a Goal for Turtle2
 
 To set a goal for `turtle2`, publish a goal to the `/turtle2/move_base_simple/goal` topic. Here is an example command to set a goal at coordinates (9.0, 9.0):
