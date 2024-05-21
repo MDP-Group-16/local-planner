@@ -5,8 +5,8 @@ from sensor_msgs.msg import LaserScan
 import math
 
 # Parameters
-RADIUS = 2.0  # Radius of the circular obstacles
-LASER_RANGE = 4.0  # Range for the laser scan to simulate circular obstacles
+RADIUS = 4.0  # Radius of the circular obstacles
+LASER_RANGE = 6.0  # Range for the laser scan to simulate circular obstacles
 RESOLUTION = 360  # Resolution of the fake laser scan (number of points)
 
 # Global variable to store turtle1's pose
@@ -27,18 +27,27 @@ def create_fake_laser_scan(turtle2_pose):
         for i in range(RESOLUTION):
             angle = scan.angle_min + i * scan.angle_increment
             world_angle = angle + turtle2_pose.theta  # Transform angle to world frame
-            x = turtle2_pose.x
-            y = turtle2_pose.y
-            x1 = turtle1_pose.x
-            y1 = turtle1_pose.y
 
-            dx = x1 - x
-            dy = y1 - y
+            # Calculate the end point of the laser ray in world coordinates
+            x_end = turtle2_pose.x + LASER_RANGE * math.cos(world_angle)
+            y_end = turtle2_pose.y + LASER_RANGE * math.sin(world_angle)
+
+            # Calculate the distance from turtle1 to the laser ray end point
+            dx = turtle1_pose.x - turtle2_pose.x
+            dy = turtle1_pose.y - turtle2_pose.y
             distance = math.sqrt(dx ** 2 + dy ** 2)
 
-            theta = math.atan2(dy, dx)
-            if abs(theta - world_angle) < scan.angle_increment:
-                if distance <= RADIUS:
+            # Check if the distance is within the obstacle radius
+            if distance <= RADIUS:
+                # Calculate the angle to turtle1 from turtle2
+                angle_to_turtle1 = math.atan2(dy, dx)
+                # Normalize the angle difference
+                angle_diff = abs(angle_to_turtle1 - world_angle)
+                if angle_diff > math.pi:
+                    angle_diff = 2 * math.pi - angle_diff
+
+                # If the angle difference is within the laser scan increment, update the range
+                if angle_diff < scan.angle_increment:
                     scan.ranges[i] = distance
 
     return scan
