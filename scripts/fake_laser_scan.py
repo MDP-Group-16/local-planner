@@ -26,6 +26,7 @@ def create_fake_laser_scan(turtle2_pose):
     if turtle1_pose:
         for i in range(RESOLUTION):
             angle = scan.angle_min + i * scan.angle_increment
+            world_angle = angle + turtle2_pose.theta  # Transform angle to world frame
             x = turtle2_pose.x
             y = turtle2_pose.y
             x1 = turtle1_pose.x
@@ -36,8 +37,8 @@ def create_fake_laser_scan(turtle2_pose):
             distance = math.sqrt(dx ** 2 + dy ** 2)
 
             theta = math.atan2(dy, dx)
-            if abs(theta - angle) < scan.angle_increment:
-                if distance <= LASER_RANGE:
+            if abs(theta - world_angle) < scan.angle_increment:
+                if distance <= RADIUS:
                     scan.ranges[i] = distance
 
     return scan
